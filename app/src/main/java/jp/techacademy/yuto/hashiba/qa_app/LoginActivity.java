@@ -156,9 +156,6 @@ public class LoginActivity extends AppCompatActivity {
                 String password = mPasswordEditText.getText().toString();
                 String name = mNameEditText.getText().toString();
 
-                View view = findViewById(android.R.id.content);
-                Snackbar.make(view, "あああ", Snackbar.LENGTH_LONG).show();
-
                 if (email.length() != 0 && password.length() >= 6 && name.length() != 0) {
                     // ログイン時に表示名を保存するようにフラグを立てる
                     mIsCreateAccount = true;

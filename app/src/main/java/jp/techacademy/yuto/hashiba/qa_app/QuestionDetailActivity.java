@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
@@ -27,7 +28,10 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        public void onChildAdded(DataSnapshot dataSnapshot, String  s) {
+
+            Log.d("test","hoge1");
+
             HashMap map = (HashMap) dataSnapshot.getValue();
 
             String answerUid = dataSnapshot.getKey();
@@ -35,6 +39,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
             for(Answer answer : mQuestion.getAnswers()) {
                 // 同じAnswerUidのものが存在しているときは何もしない
                 if (answerUid.equals(answer.getAnswerUid())) {
+                    Log.d("test","hoge5");
                     return;
                 }
             }
@@ -42,6 +47,9 @@ public class QuestionDetailActivity extends AppCompatActivity {
             String body = (String) map.get("body");
             String name = (String) map.get("name");
             String uid = (String) map.get("uid");
+
+            Log.d("test","hoge6");
+
 
             Answer answer = new Answer(body, name, uid, answerUid);
             mQuestion.getAnswers().add(answer);
@@ -74,6 +82,9 @@ public class QuestionDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_detail);
 
+        Log.d("test","hoge2");
+
+
         // 渡ってきたQuestionのオブジェクトを保持する
         Bundle extras = getIntent().getExtras();
         mQuestion = (Question) extras.get("question");
@@ -92,6 +103,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // ログイン済みのユーザーを取得する
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                Log.d("test","hoge3");
 
                 if (user == null) {
                     // ログインしていなければログイン画面に遷移させる
@@ -109,5 +121,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
         mAnswerRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getGenre())).child(mQuestion.getQuestionUid()).child(Const.AnswersPATH);
         mAnswerRef.addChildEventListener(mEventListener);
+        Log.d("test","hoge4");
+
     }
 }
