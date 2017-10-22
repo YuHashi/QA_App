@@ -41,6 +41,9 @@ public class QuestionSendActivity extends AppCompatActivity implements View.OnCl
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     private static final int CHOOSER_REQUEST_CODE = 100;
 
+    private static final String FAB_CODE_NO = "NO";
+    private static final String FAB_CODE_OK = "OK";
+
     private ProgressDialog mProgress;
     private EditText mTitleText;
     private EditText mBodyText;
@@ -180,6 +183,8 @@ public class QuestionSendActivity extends AppCompatActivity implements View.OnCl
             data.put("title", title);
             data.put("body", body);
             data.put("name", name);
+
+            data.put("fab", FAB_CODE_NO);
 
             // 添付画像を取得する
             BitmapDrawable drawable = (BitmapDrawable) mImageView.getDrawable();

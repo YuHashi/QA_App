@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
                 bytes = new byte[0];
             }
 
+            String fab = (String) map.get("fab");
+
             ArrayList<Answer> answerArrayList = new ArrayList<Answer>();
             HashMap answerMap = (HashMap) map.get("answers");
             if (answerMap != null) {
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            Question question = new Question(title, body, name, uid, dataSnapshot.getKey(), mGenre, bytes, answerArrayList);
+            Question question = new Question(title, body, name, uid, dataSnapshot.getKey(), mGenre, bytes, answerArrayList, fab);
             mQuestionArrayList.add(question);
             mAdapter.notifyDataSetChanged();
         }

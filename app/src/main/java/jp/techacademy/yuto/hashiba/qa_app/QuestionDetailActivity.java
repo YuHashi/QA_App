@@ -3,6 +3,7 @@ package jp.techacademy.yuto.hashiba.qa_app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -30,8 +31,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String  s) {
 
-            Log.d("test","hoge1");
-
             HashMap map = (HashMap) dataSnapshot.getValue();
 
             String answerUid = dataSnapshot.getKey();
@@ -39,7 +38,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
             for(Answer answer : mQuestion.getAnswers()) {
                 // 同じAnswerUidのものが存在しているときは何もしない
                 if (answerUid.equals(answer.getAnswerUid())) {
-                    Log.d("test","hoge5");
                     return;
                 }
             }
@@ -47,9 +45,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
             String body = (String) map.get("body");
             String name = (String) map.get("name");
             String uid = (String) map.get("uid");
-
-            Log.d("test","hoge6");
-
 
             Answer answer = new Answer(body, name, uid, answerUid);
             mQuestion.getAnswers().add(answer);
@@ -82,9 +77,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_detail);
 
-        Log.d("test","hoge2");
-
-
         // 渡ってきたQuestionのオブジェクトを保持する
         Bundle extras = getIntent().getExtras();
         mQuestion = (Question) extras.get("question");
@@ -103,7 +95,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // ログイン済みのユーザーを取得する
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                Log.d("test","hoge3");
 
                 if (user == null) {
                     // ログインしていなければログイン画面に遷移させる
@@ -118,10 +109,33 @@ public class QuestionDetailActivity extends AppCompatActivity {
             }
         });
 
+
+        FloatingActionButton fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
+        fab1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Snackbar.make(view, "hoge", Snackbar.LENGTH_LONG).show();
+
+//                // ログイン済みのユーザーを取得する
+//                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//
+//                if (user == null) {
+//                    // ログインしていなければログイン画面に遷移させる
+//                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+//                    startActivity(intent);
+//                } else {
+//                    // Questionを渡して回答作成画面を起動する
+//                    Intent intent = new Intent(getApplicationContext(), AnswerSendActivity.class);
+//                    intent.putExtra("question", mQuestion);
+//                    startActivity(intent);
+                }
+        });
+
+
+
         DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
         mAnswerRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getGenre())).child(mQuestion.getQuestionUid()).child(Const.AnswersPATH);
         mAnswerRef.addChildEventListener(mEventListener);
-        Log.d("test","hoge4");
-
     }
 }
