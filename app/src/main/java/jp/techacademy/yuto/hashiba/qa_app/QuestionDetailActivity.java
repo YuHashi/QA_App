@@ -1,12 +1,14 @@
 package jp.techacademy.yuto.hashiba.qa_app;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class QuestionDetailActivity extends AppCompatActivity {
 
@@ -53,7 +56,6 @@ public class QuestionDetailActivity extends AppCompatActivity {
 
         @Override
         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
         }
 
         @Override
@@ -80,6 +82,14 @@ public class QuestionDetailActivity extends AppCompatActivity {
         // 渡ってきたQuestionのオブジェクトを保持する
         Bundle extras = getIntent().getExtras();
         mQuestion = (Question) extras.get("question");
+
+        final Button fab1 = (Button) findViewById(R.id.fab_1);
+
+        if("NO".equals(mQuestion.getFab())){
+            fab1.setBackground(getResources().getDrawable(R.drawable.fab_no));
+        } else {
+            fab1.setBackground(getResources().getDrawable(R.drawable.fab_yes));
+        }
 
         setTitle(mQuestion.getTitle());
 
@@ -110,29 +120,33 @@ public class QuestionDetailActivity extends AppCompatActivity {
         });
 
 
-        FloatingActionButton fab1 = (FloatingActionButton) findViewById(R.id.fab_1);
         fab1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                Snackbar.make(view, "hoge", Snackbar.LENGTH_LONG).show();
-
-//                // ログイン済みのユーザーを取得する
-//                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//
-//                if (user == null) {
-//                    // ログインしていなければログイン画面に遷移させる
-//                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-//                    startActivity(intent);
-//                } else {
-//                    // Questionを渡して回答作成画面を起動する
-//                    Intent intent = new Intent(getApplicationContext(), AnswerSendActivity.class);
-//                    intent.putExtra("question", mQuestion);
-//                    startActivity(intent);
+                if("NO".equals(mQuestion.getFab())){
+                    mQuestion.setFab("YES");
+                    Snackbar.make(view, "お気に入りに登録しました"+mQuestion.getFab(), Snackbar.LENGTH_LONG).show();
+                    fab1.setBackground(getResources().getDrawable(R.drawable.fab_yes));
+                } else {
+                    mQuestion.setFab("NO");
+                    Snackbar.make(view, "お気に入りから外しました"+mQuestion.getFab(), Snackbar.LENGTH_LONG).show();
+                    fab1.setBackground(getResources().getDrawable(R.drawable.fab_no));
                 }
+
+                DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
+
+                String thisGenre = String.valueOf(mQuestion.getGenre());
+                String thisQuestionId = mQuestion.getQuestionUid();
+                String thisFab = mQuestion.getFab();
+
+                DatabaseReference thisFabRef = dataBaseReference.child(Const.ContentsPATH).child(thisGenre).child(thisQuestionId).child(thisFab);
+
+                Map<String, String> data = new HashMap<String, String>();
+                data.put("fab", mQuestion.getFab());
+                thisFabRef.push().setValue(data);
+
+            }
         });
-
-
 
         DatabaseReference dataBaseReference = FirebaseDatabase.getInstance().getReference();
         mAnswerRef = dataBaseReference.child(Const.ContentsPATH).child(String.valueOf(mQuestion.getGenre())).child(mQuestion.getQuestionUid()).child(Const.AnswersPATH);

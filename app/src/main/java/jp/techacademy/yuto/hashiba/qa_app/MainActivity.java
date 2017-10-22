@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,17 +35,20 @@ public class MainActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private int mGenre = 0;
+    private int mGenreFab = 0;
 
     private DatabaseReference mDatabaseReference;
     private DatabaseReference mGenreRef;
     private ListView mListView;
     private ArrayList<Question> mQuestionArrayList;
     private QuestionsListAdapter mAdapter;
+    private View view;
 
     private ChildEventListener mEventListener = new ChildEventListener() {
         @Override
         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
             HashMap map = (HashMap) dataSnapshot.getValue();
+
             String title = (String) map.get("title");
             String body = (String) map.get("body");
             String name = (String) map.get("name");
@@ -132,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // --- ここから ---
                 // ジャンルを選択していない場合（mGenre == 0）はエラーを表示するだけ
-                if (mGenre == 0) {
+                if (mGenre == 0 && mGenreFab == 0) {
                     Snackbar.make(view, "ジャンルを選択して下さい", Snackbar.LENGTH_LONG).show();
                     return;
                 }
@@ -150,7 +154,6 @@ public class MainActivity extends AppCompatActivity {
                     intent.putExtra("genre", mGenre);
                     startActivity(intent);
                 }
-                // --- ここまで修正 ---
             }
         });
 
@@ -178,6 +181,10 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_compter) {
                     mToolbar.setTitle("コンピューター");
                     mGenre = 4;
+                } else if (id == R.id.nav_fab) {
+                    mToolbar.setTitle("お気に入り");
+                    mGenre = 0;
+                    mGenreFab = 1;
                 }
 
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -187,13 +194,24 @@ public class MainActivity extends AppCompatActivity {
                 mAdapter.setQuestionArrayList(mQuestionArrayList);
                 mListView.setAdapter(mAdapter);
 
-                // 選択したジャンルにリスナーを登録する
-                if (mGenreRef != null) {
-                    mGenreRef.removeEventListener(mEventListener);
-                }
-                mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
-                mGenreRef.addChildEventListener(mEventListener);
+                if (mGenreFab == 0) {
+                    // 選択したジャンルにリスナーを登録する
+                    if (mGenreRef != null) {
+                        mGenreRef.removeEventListener(mEventListener);
+                    }
+                    mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child(String.valueOf(mGenre));
+                    mGenreRef.addChildEventListener(mEventListener);
 
+                    //お気に入りがDrawerから選ばれたとき、全ジャンルを取得し、かつそこからFabが"Yes"のものを表示するようにする。
+                    //★全ジャンルを取得する方法はこれであってるのか。
+                } else {
+                    mGenreRef.removeEventListener(mEventListener);
+                    mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child("1").child(Const.FabPATH).child("YES");
+                    mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child("2").child(Const.FabPATH).child("YES");
+                    mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child("3").child(Const.FabPATH).child("YES");
+                    mGenreRef = mDatabaseReference.child(Const.ContentsPATH).child("4").child(Const.FabPATH).child("YES");
+                    mGenreRef.addChildEventListener(mEventListener);
+                }
                 return true;
             }
         });
@@ -216,12 +234,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
-
-
-
-
 
 
     @Override

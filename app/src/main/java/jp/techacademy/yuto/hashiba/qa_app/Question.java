@@ -54,6 +54,9 @@ public class Question implements Serializable {
         return mFab;
     }
 
+    public void setFab(String s) {
+         mFab = s;
+    }
 
     public Question(String title, String body, String name, String uid, String questionUid, int genre, byte[] bytes, ArrayList<Answer> answers, String fab) {
         mTitle = title;
